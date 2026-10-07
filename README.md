@@ -1,12 +1,13 @@
 # 進階身體檢查與評估 · 研究工具箱
 
-這個 repo 裡有三樣東西：
+這個 repo 裡有四樣東西：
 
 | 項目 | 是什麼 | 網址／位置 |
 |---|---|---|
 | 🩺 **身體評估 OSCE 複習系統** | 碩士班「進階身體檢查與評估」課程的互動式檢查表，附 AI 臨床助教 | <https://bobyu89.github.io/-/> |
 | 📘 **Notero 安裝精靈** | 一步一步帶你安裝 Notero、把 Zotero 連到 Notion 的教學頁 | <https://bobyu89.github.io/-/notero-install-guide.html> |
 | 🔗 **Zotero Bridge** | Zotero 10 插件：用 AI 整理文獻筆記，同步到 Notion 與 Obsidian | [`zotero-bridge/`](zotero-bridge/)，下載請到 [Releases](https://github.com/bobyu89/-/releases) |
+| 🧠 **研究大腦** | Claude Code／Codex 設定檔：讀你的文獻筆記與 Zotero，做跨文獻比較、研究缺口、文獻探討初稿 | [`research-brain/`](research-brain/) |
 
 ---
 
@@ -57,6 +58,19 @@
 - 重新同步不會覆蓋你自己寫的內容
 
 安裝與設定請看 **[Zotero Bridge 使用說明](zotero-bridge/README.md)**。
+
+---
+
+## 🧠 研究大腦
+
+把 Claude Code 或 Codex 接上 Zotero、Notion 和你的 Obsidian vault，用斜線指令完成跨文獻的工作：
+
+- `/lit-compare 跌倒預防`：文獻比較表、主題整理、研究缺口
+- `/research-gaps`：研究缺口與 PICO 研究問題
+- `/lit-review-draft`：文獻探討初稿
+- `/inbox-triage`：待讀文獻與建議閱讀順序
+
+安裝請看 **[研究大腦說明](research-brain/README.md)**。
 
 ---
 
@@ -113,5 +127,6 @@ npm run build     # 產生 dist/zotero-bridge-<版本>.xpi
 ├── public/
 │   └── notero-install-guide.html  # Notero 安裝精靈
 ├── zotero-bridge/              # Zotero 10 插件（獨立的子專案）
+├── research-brain/             # Claude Code／Codex「研究大腦」設定檔
 └── .github/workflows/          # GitHub Pages、Releases、測試
 ```
