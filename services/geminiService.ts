@@ -1,9 +1,39 @@
 import { GoogleGenAI } from "@google/genai";
 
+// The site is public (GitHub Pages), so no key is built into it: each visitor enters
+// their own Gemini API key, which stays in their browser's localStorage.
+const STORAGE_KEY = "gemini_api_key";
+
+const getApiKey = (): string => {
+  if (process.env.API_KEY) return process.env.API_KEY;
+  try {
+    return localStorage.getItem(STORAGE_KEY) || "";
+  } catch {
+    return "";
+  }
+};
+
+export const hasApiKey = (): boolean => getApiKey() !== "";
+
+export const saveApiKey = (key: string): void => {
+  try {
+    localStorage.setItem(STORAGE_KEY, key.trim());
+  } catch {
+    // Storage blocked (e.g. private mode): the key can't be remembered
+  }
+};
+
+export const clearApiKey = (): void => {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+};
+
 const getClient = () => {
-  const apiKey = process.env.API_KEY;
+  const apiKey = getApiKey();
   if (!apiKey) {
-    console.error("API_KEY is not defined in the environment.");
     return null;
   }
   return new GoogleGenAI({ apiKey });
@@ -12,7 +42,7 @@ const getClient = () => {
 export const getExplanationForAssessment = async (assessmentItem: string, context: string) => {
   const ai = getClient();
   if (!ai) {
-    throw new Error("API Key missing. Please set your API key in the environment.");
+    throw new Error("API Key missing.");
   }
 
   const prompt = `

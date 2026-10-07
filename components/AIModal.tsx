@@ -1,5 +1,5 @@
-import React from 'react';
-import { X, Bot, Youtube, ExternalLink, BookOpen } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Bot, Youtube, ExternalLink, BookOpen, KeyRound } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface AIModalProps {
@@ -8,9 +8,15 @@ interface AIModalProps {
   title: string;
   content: string | null;
   isLoading: boolean;
+  needsApiKey: boolean;
+  onSubmitApiKey: (key: string) => void;
+  onResetApiKey: () => void;
 }
 
-export const AIModal: React.FC<AIModalProps> = ({ isOpen, onClose, title, content, isLoading }) => {
+export const AIModal: React.FC<AIModalProps> = ({
+  isOpen, onClose, title, content, isLoading, needsApiKey, onSubmitApiKey, onResetApiKey,
+}) => {
+  const [keyInput, setKeyInput] = useState('');
   if (!isOpen) return null;
 
   return (
@@ -43,7 +49,51 @@ export const AIModal: React.FC<AIModalProps> = ({ isOpen, onClose, title, conten
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-white scroll-smooth">
-          {isLoading ? (
+          {needsApiKey ? (
+            <form
+              className="max-w-lg mx-auto py-6 space-y-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (keyInput.trim()) {
+                  onSubmitApiKey(keyInput);
+                  setKeyInput('');
+                }
+              }}
+            >
+              <div className="flex items-center gap-2 text-slate-800 font-bold text-lg">
+                <KeyRound size={20} className="text-indigo-600" />
+                請輸入你的 Gemini API 金鑰
+              </div>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                AI 臨床助教使用 Google Gemini。金鑰只會儲存在這台裝置的瀏覽器中，不會上傳到本網站。
+                可以到{' '}
+                <a
+                  href="https://aistudio.google.com/apikey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-600 underline"
+                >
+                  Google AI Studio
+                </a>{' '}
+                免費建立金鑰。
+              </p>
+              <input
+                type="password"
+                value={keyInput}
+                onChange={(e) => setKeyInput(e.target.value)}
+                placeholder="AIza..."
+                autoFocus
+                className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+              <button
+                type="submit"
+                disabled={!keyInput.trim()}
+                className="w-full px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 font-medium text-sm"
+              >
+                儲存並取得解釋
+              </button>
+            </form>
+          ) : isLoading ? (
             <div className="flex flex-col items-center justify-center h-64 space-y-6">
               <div className="relative">
                 <div className="w-16 h-16 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
@@ -128,7 +178,15 @@ export const AIModal: React.FC<AIModalProps> = ({ isOpen, onClose, title, conten
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-100 bg-slate-50 text-right">
+        <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-4">
+          {!needsApiKey ? (
+            <button
+              onClick={onResetApiKey}
+              className="text-sm text-slate-500 hover:text-slate-700 underline underline-offset-2"
+            >
+              更換 API 金鑰
+            </button>
+          ) : <span />}
           <button 
             onClick={onClose}
             className="px-6 py-2.5 bg-slate-900 text-white rounded-lg hover:bg-slate-800 active:transform active:scale-95 transition-all font-medium text-sm shadow-lg shadow-slate-200"

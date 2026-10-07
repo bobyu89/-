@@ -7,6 +7,8 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, (process as any).cwd(), '');
 
   return {
+    // Relative asset paths so the site works under https://<user>.github.io/<repo>/
+    base: './',
     plugins: [react()],
     define: {
       // Polyfill process.env.API_KEY so it works in the browser build

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { scenarios } from './data';
 import { AssessmentItem } from './types';
-import { getExplanationForAssessment } from './services/geminiService';
+import { getExplanationForAssessment, hasApiKey, saveApiKey, clearApiKey } from './services/geminiService';
 import { AIModal } from './components/AIModal';
 import { 
   CheckCircle2, 
@@ -18,6 +18,8 @@ const App: React.FC = () => {
   const [activeScenarioId, setActiveScenarioId] = useState<string>(scenarios[0].id);
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [needsApiKey, setNeedsApiKey] = useState(false);
+  const [pendingItem, setPendingItem] = useState<AssessmentItem | null>(null);
   
   // AI Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,9 +53,7 @@ const App: React.FC = () => {
     }));
   };
 
-  const handleAskAI = async (item: AssessmentItem) => {
-    setModalTitle(item.text);
-    setIsModalOpen(true);
+  const askAI = async (item: AssessmentItem) => {
     setIsAiLoading(true);
     setModalContent(null);
 
@@ -61,10 +61,35 @@ const App: React.FC = () => {
       const explanation = await getExplanationForAssessment(item.text, activeScenario.title);
       setModalContent(explanation || "未收到回應。");
     } catch (error) {
-      setModalContent("抱歉，目前無法取得解釋。請檢查您的 API 金鑰設定。");
+      setModalContent("抱歉，目前無法取得解釋。請確認 Gemini API 金鑰是否正確（可按下方「更換 API 金鑰」重新輸入）。");
     } finally {
       setIsAiLoading(false);
     }
+  };
+
+  const handleAskAI = async (item: AssessmentItem) => {
+    setModalTitle(item.text);
+    setPendingItem(item);
+    setIsModalOpen(true);
+    if (!hasApiKey()) {
+      setNeedsApiKey(true);
+      setModalContent(null);
+      return;
+    }
+    setNeedsApiKey(false);
+    await askAI(item);
+  };
+
+  const handleSubmitApiKey = async (key: string) => {
+    saveApiKey(key);
+    setNeedsApiKey(false);
+    if (pendingItem) await askAI(pendingItem);
+  };
+
+  const handleResetApiKey = () => {
+    clearApiKey();
+    setModalContent(null);
+    setNeedsApiKey(true);
   };
 
   const calculateProgress = () => {
@@ -310,6 +335,9 @@ const App: React.FC = () => {
         title={modalTitle}
         content={modalContent}
         isLoading={isAiLoading}
+        needsApiKey={needsApiKey}
+        onSubmitApiKey={handleSubmitApiKey}
+        onResetApiKey={handleResetApiKey}
       />
     </div>
   );
