@@ -1,3 +1,0 @@
-node_modules/
-# Built plugin is committed so it can be downloaded directly
-!dist/

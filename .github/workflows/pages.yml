@@ -4,11 +4,7 @@ name: pages
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - "zotero-bridge/**"
   pull_request:
-    paths-ignore:
-      - "zotero-bridge/**"
   workflow_dispatch:
 
 permissions:
