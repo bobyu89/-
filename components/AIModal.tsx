@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Bot, Loader2, Youtube, ExternalLink, BookOpen } from 'lucide-react';
+import { X, Bot, Youtube, ExternalLink, BookOpen } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface AIModalProps {
