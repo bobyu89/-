@@ -1,0 +1,3 @@
+# The Zotero plugin and CI config are not part of the web app deployment
+zotero-bridge
+.github
