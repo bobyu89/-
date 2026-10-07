@@ -155,6 +155,14 @@ code, .file { font-family: var(--font-mono); font-size: 0.88em; background: var(
 .check input:checked + .box::after { content: ""; width: 10px; height: 6px; border-left: 2px solid var(--surface); border-bottom: 2px solid var(--surface); transform: rotate(-45deg) translate(1px, -1px); }
 .check input:checked ~ span { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
 
+.check label.auto { cursor: pointer; }
+.check label.auto input:not(:checked) + .box { border-style: dashed; }
+.auto-tag { font-style: normal; font-size: 12px; color: var(--muted); background: var(--chip); padding: 1px 6px; border-radius: 4px; margin-left: 4px; white-space: nowrap; }
+.check input:checked ~ span .auto-tag { text-decoration: none; }
+.choices.nudge label { animation: nudge .9s ease; }
+@keyframes nudge { 0%, 100% { box-shadow: 0 0 0 0 transparent; } 30%, 70% { box-shadow: 0 0 0 3px var(--accent); } }
+.hint.alert { color: var(--accent); font-weight: 700; }
+
 /* 疑難排解 */
 details.trouble { border: 1px solid var(--line); border-radius: 10px; }
 details.trouble summary { cursor: pointer; padding: 12px 16px; font-weight: 500; list-style: none; display: flex; gap: 8px; align-items: center; }
@@ -209,7 +217,7 @@ footer { font-size: 13px; color: var(--muted); }
   .rail button[aria-current="step"] { box-shadow: none; background: transparent; }
   .meta { text-align: left; }
 }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
 </style>
 </head>
 <body>
@@ -250,7 +258,7 @@ footer { font-size: 13px; color: var(--muted); }
           <h3>打勾確認</h3>
           <label><input type="checkbox" id="c0a"><span class="box"></span><span>我的電腦上有 <b>Zotero 桌面版</b>（不是瀏覽器裡的 Zotero Connector，也不是 zotero.org 網頁版）。還沒有也沒關係，下一步會帶你裝。</span></label>
           <label><input type="checkbox" id="c0b"><span class="box"></span><span>我有 <b>Notion 帳號</b>，而且知道密碼。沒有的話先到 <a href="https://www.notion.so/signup" target="_blank" rel="noopener">notion.so/signup</a> 免費註冊。</span></label>
-          <label><input type="checkbox" id="c0c"><span class="box"></span><span>我已經選好上面的電腦類型。</span></label>
+          <label class="auto"><input type="checkbox" id="c0c"><span class="box"></span><span>在上方選好電腦類型 <em class="auto-tag">選了會自動打勾</em></span></label>
         </div>
       </section>
 
@@ -287,7 +295,7 @@ footer { font-size: 13px; color: var(--muted); }
 
         <div class="check">
           <h3>打勾確認</h3>
-          <label><input type="checkbox" id="c1a"><span class="box"></span><span>我已經在上面選好自己的 Zotero 版本，而且版本是 7 以上。</span></label>
+          <label class="auto"><input type="checkbox" id="c1a"><span class="box"></span><span>在上方選好 Zotero 版本，而且是 7 以上 <em class="auto-tag">選了會自動打勾</em></span></label>
         </div>
       </section>
 
@@ -406,7 +414,7 @@ footer { font-size: 13px; color: var(--muted); }
 
         <div class="check">
           <h3>打勾確認</h3>
-          <label><input type="checkbox" id="c4a"><span class="box"></span><span>我已經在上方選了「使用範本」或「現有資料庫」。</span></label>
+          <label class="auto"><input type="checkbox" id="c4a"><span class="box"></span><span>在上方選好「使用範本」或「現有資料庫」 <em class="auto-tag">選了會自動打勾</em></span></label>
           <label><input type="checkbox" id="c4b"><span class="box"></span><span>Notero 設定畫面顯示已連接 Notion，並看得到我的工作區名稱。</span></label>
         </div>
 
@@ -627,9 +635,23 @@ footer { font-size: 13px; color: var(--muted); }
     document.getElementById('zvMissing').hidden = !!state.zv;
     document.getElementById('dbMissing').hidden = !!state.db;
     // 選了就自動打勾對應確認
-    setCheck('c0c', !!state.os); setCheck('c4a', !!state.db);
-    setCheck('c1a', state.zv === '10' || state.zv === '7' ? state.checks.c1a : false);
-    document.getElementById('c1a').disabled = !(state.zv === '10' || state.zv === '7');
+    // 由上方選項決定的勾選框
+    Object.keys(AUTO).forEach(function (id) { setCheck(id, autoValue(id)); });
+  }
+  var AUTO = { c0c: 'os', c1a: 'zv', c4a: 'db' };
+  function autoValue(id) {
+    if (id === 'c1a') return state.zv === '10' || state.zv === '7';
+    return !!state[AUTO[id]];
+  }
+  function nudge(id) {
+    var group = document.querySelector('input[name=' + AUTO[id] + ']').closest('.choices');
+    group.classList.remove('nudge'); void group.offsetWidth; group.classList.add('nudge');
+    group.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    var hint = document.getElementById('hint');
+    hint.textContent = id === 'c1a' && state.zv === 'old'
+      ? '請先安裝 Zotero 10，再回來改選「10 或更新」'
+      : '請點上方其中一個選項，這一項就會自動打勾';
+    hint.classList.add('alert');
   }
   function setCheck(id, v) { var el = document.getElementById(id); el.checked = !!v; state.checks[id] = !!v; }
 
@@ -652,9 +674,11 @@ footer { font-size: 13px; color: var(--muted); }
       next.hidden = true; hint.textContent = '';
     } else {
       next.hidden = false;
+      hint.classList.remove('alert');
       var cs = visibleChecks(steps[state.step]);
       var n = cs.filter(function (c) { return c.checked; }).length;
       hint.textContent = n === cs.length ? '這一步完成了' : '已確認 ' + n + ' / ' + cs.length + ' 項';
+      if (state.step === 1 && state.zv === 'old') hint.textContent = '先安裝 Zotero 10，再回來改選「10 或更新」';
       next.textContent = n === cs.length ? '下一步 →' : '先跳過，下一步 →';
       next.classList.toggle('ghost', n !== cs.length);
     }
@@ -674,12 +698,18 @@ footer { font-size: 13px; color: var(--muted); }
 
   document.querySelectorAll('.check input[type=checkbox]').forEach(function (c) {
     if (state.checks[c.id]) c.checked = true;
-    c.addEventListener('change', function () { state.checks[c.id] = c.checked; save(); refresh(); });
+    c.addEventListener('change', function () {
+      if (AUTO[c.id]) {
+        c.checked = autoValue(c.id);
+        if (c.checked) refresh(); else nudge(c.id);
+        return;
+      }
+      state.checks[c.id] = c.checked; save(); refresh();
+    });
   });
   document.querySelectorAll('input[type=radio]').forEach(function (r) {
     r.addEventListener('change', function () {
       state[r.name] = r.value;
-      if (r.name === 'zv') state.checks.c1a = r.value !== 'old';
       applyChoices(); save(); refresh();
     });
   });
