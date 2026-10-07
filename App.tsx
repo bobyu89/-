@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { scenarios } from './data';
-import { AssessmentScenario, AssessmentItem } from './types';
+import { AssessmentItem } from './types';
 import { getExplanationForAssessment } from './services/geminiService';
 import { AIModal } from './components/AIModal';
 import { 
