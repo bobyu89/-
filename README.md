@@ -1,13 +1,11 @@
-# 進階身體檢查與評估 · 研究工具箱
+# 進階身體檢查與評估 · OSCE 複習系統
 
-這個 repo 裡有四樣東西：
+這個 repo 裡有兩樣東西：
 
 | 項目 | 是什麼 | 網址／位置 |
 |---|---|---|
 | 🩺 **身體評估 OSCE 複習系統** | 碩士班「進階身體檢查與評估」課程的互動式檢查表，附 AI 臨床助教 | <https://bobyu89.github.io/-/> |
 | 📘 **Notero 安裝精靈** | 一步一步帶你安裝 Notero、把 Zotero 連到 Notion 的教學頁 | <https://bobyu89.github.io/-/notero-install-guide.html> |
-| 🔗 **Zotero Bridge** | Zotero 10 插件：用 AI 整理文獻筆記，同步到 Notion 與 Obsidian | [`zotero-bridge/`](zotero-bridge/)，下載請到 [Releases](https://github.com/bobyu89/-/releases) |
-| 🧠 **研究大腦** | Claude Code／Codex 設定檔：讀你的文獻筆記與 Zotero，做跨文獻比較、研究缺口、文獻探討初稿 | [`research-brain/`](research-brain/) |
 
 ---
 
@@ -46,43 +44,20 @@
 
 > AI 的說明僅供學習參考，實際操作請以課程講義與臨床指引為準。
 
----
-
-## 🔗 Zotero Bridge
-
-把「Zotero 管理文獻 → AI 整理筆記 → Notion／Obsidian 閱讀與建立連結」串成一鍵完成：
-
-- 用 Claude 或 OpenAI 讀書目、摘要、全文和你的劃線，產生結構化文獻筆記（研究設計、樣本、結果、限制、證據等級、對研究的啟發）
-- 依文獻庫或分類，分流到不同的 Notion 資料庫與 Obsidian 資料夾
-- Notion 以書目資料當作表頭；Obsidian 支援 1.14 的彩色劃線與 Bases 看板
-- 重新同步不會覆蓋你自己寫的內容
-
-安裝與設定請看 **[Zotero Bridge 使用說明](zotero-bridge/README.md)**。
 
 ---
 
-## 🧠 研究大腦
-
-把 Claude Code 或 Codex 接上 Zotero、Notion 和你的 Obsidian vault，用斜線指令完成跨文獻的工作：
-
-- `/lit-compare 跌倒預防`：文獻比較表、主題整理、研究缺口
-- `/research-gaps`：研究缺口與 PICO 研究問題
-- `/lit-review-draft`：文獻探討初稿
-- `/inbox-triage`：待讀文獻與建議閱讀順序
-
-安裝請看 **[研究大腦說明](research-brain/README.md)**。
+> 📦 **Zotero Bridge 插件與研究大腦已搬到獨立的 repo：[bobyu89/zotero-bridge](https://github.com/bobyu89/zotero-bridge)**
 
 ---
 
 ## 部署方式
 
-全部使用 GitHub，不使用 Vercel：
+使用 GitHub Pages，不使用 Vercel：
 
 | 內容 | 方式 | 觸發時機 |
 |---|---|---|
 | 網站（OSCE 複習系統、Notero 安裝精靈） | GitHub Pages（`.github/workflows/pages.yml`） | 推送到 `main` |
-| Zotero Bridge 插件 | GitHub Releases（`.github/workflows/zotero-bridge-release.yml`） | `main` 上的插件版本號更新 |
-| 插件測試 | GitHub Actions（`.github/workflows/zotero-bridge.yml`） | 每次推送與 PR |
 
 第一次使用 GitHub Pages 時，需要到 **Settings → Pages → Source** 選擇 **GitHub Actions**。
 
@@ -108,15 +83,6 @@ API_KEY=你的 Gemini API 金鑰
 
 > ⚠️ 這個金鑰會被打包進網站程式碼，只能用在本機開發，**不要**放進 GitHub Actions 或公開部署。
 
-### Zotero Bridge
-
-```bash
-cd zotero-bridge
-npm install
-npm test          # 執行測試
-npm run build     # 產生 dist/zotero-bridge-<版本>.xpi
-```
-
 ### 專案結構
 
 ```
@@ -126,7 +92,5 @@ npm run build     # 產生 dist/zotero-bridge-<版本>.xpi
 ├── services/geminiService.ts   # Gemini API 呼叫與金鑰管理
 ├── public/
 │   └── notero-install-guide.html  # Notero 安裝精靈
-├── zotero-bridge/              # Zotero 10 插件（獨立的子專案）
-├── research-brain/             # Claude Code／Codex「研究大腦」設定檔
-└── .github/workflows/          # GitHub Pages、Releases、測試
+└── .github/workflows/pages.yml  # 部署到 GitHub Pages
 ```
